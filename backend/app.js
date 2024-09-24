@@ -27,10 +27,6 @@ app.use('/api/v1/customer',customerAuthRouter);
 
 
 
-
-
-
-
 app.listen(8000,()=>{
     console.log("successfully connected")
 })

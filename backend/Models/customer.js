@@ -21,11 +21,18 @@ const customerSchema = new mongoose.Schema(
     address: {
       type: String, // Optional: Address for deliveries or pickups
     },
+    resetPasswordKey: {
+      type:String
+    },
+    otpSentAt:{
+      type:Date
+    }
   },
   {
     timestamps: true, // Automatically creates and manages `createdAt` and `updatedAt`
   }
 );
+
 
 const customerModel = mongoose.model('Customer', customerSchema);
 
