@@ -13,10 +13,10 @@ customerRouter.route('/login')
 
 
 // Route to request OTP for password reset
-customerRouter.post('/requestPasswordReset', customerPasswordReset);
+customerRouter.route('/requestPasswordReset').post(customerPasswordReset);
 
 // Route to verify OTP and reset password
-customerRouter.post('/verifyOtpAndResetPassword', customerVerifyOtpAndResetPassword);
+customerRouter.route('/verifyOtpAndResetPassword').post(customerVerifyOtpAndResetPassword);
 
 
 

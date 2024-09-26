@@ -4,8 +4,8 @@ const customerModel = require("../Models/customer");
 const bcrypt = require("bcrypt");
 const authenticator = require('authenticator'); 
 const nodemailer = require('nodemailer'); 
-const { getMaxListeners } = require("nodemailer/lib/xoauth2");
-var smtpTransport = require('nodemailer-smtp-transport');
+// const { getMaxListeners } = require("nodemailer/lib/xoauth2");
+// var smtpTransport = require('nodemailer-smtp-transport');
 
 const generateToken = (x) => {
     return jwt.sign({ userId: x }, 'mysecret123', { expiresIn: '1d' });
@@ -94,13 +94,7 @@ const customerSignup = async (req, res) => {
 }
 
 // Email transport for sending OTP
-// const transporter = nodemailer.createTransport({
-//     service: 'Gmail',
-//     auth: {
-//         user: 'abhishek.katiyar.983932@gmail.com', 
-//         pass: 'Kietmca2325@12'
-//     }
-// });
+
 
 const transporter = nodemailer.createTransport({
     service:"gmail",
