@@ -1,5 +1,5 @@
 const express=require("express");
-const{customerLogin,customerSignup,customerPasswordReset,customerVerifyOtpAndResetPassword}=require("../Controller/customerAuth");
+const{customerLogin,customerSignup,customerPasswordReset,customerVerifyOtpAndResetPassword,customerLogout}=require("../Controller/customerAuth");
 
 
 const customerRouter=express.Router();
@@ -10,6 +10,10 @@ customerRouter.route('/signup')
 
 customerRouter.route('/login')
 .post(customerLogin);
+
+customerRouter.route('/logout')
+.post(customerLogout);
+
 
 
 // Route to request OTP for password reset

@@ -19,34 +19,40 @@ const customerLogin = async (req, res) => {
     try {
         const { email, password } = req.body;
         if (!email || !password) {
-            return res.status(401).json({
+            return res.status(400).json({
                 status: 'fail',
-                message: 'Please provide the valid email and password'
+                message: 'Please provide valid email and password.'
             });
         }
 
         const user = await customerModel.findOne({ email });
         if (user) {
-            const hashedPassword = user.password;
-            const result = await bcrypt.compare(password, hashedPassword);
+            const result = await bcrypt.compare(password, user.password);
             if (result) {
+                // Store user information in the session
+                req.session.userId = user.id; // Store user ID in the session
+                req.session.email = user.email; // Optional: store other user info if needed
+                
                 return res.status(200).json({
                     status: 'success',
                     data: {
-                        user: user,
-                        token: generateToken(user.id),
+                        user: {
+                            id: user.id,
+                            email: user.email,
+                            // add other user fields if necessary
+                        },
                     }
                 });
             } else {
                 return res.status(401).json({
                     status: 'fail',
-                    message: 'Email or Password is Incorrect',
+                    message: 'Email or Password is Incorrect.',
                 });
             }
         } else {
             return res.status(404).json({
                 status: 'fail',
-                message: 'User not found',
+                message: 'User not found.',
             });
         }
     } catch (err) {
@@ -55,7 +61,25 @@ const customerLogin = async (req, res) => {
             message: err.message,
         });
     }
-}
+};
+
+// Logout function
+const customerLogout = (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({
+                status: 'fail',
+                message: 'Error logging out.',
+            });
+        }
+        res.clearCookie('connect.sid'); // Clear session cookie
+        return res.status(200).json({
+            status: 'success',
+            message: 'Successfully logged out.',
+        });
+    });
+};
+
 
 const customerSignup = async (req, res) => {
     try {
@@ -164,10 +188,10 @@ const customerVerifyOtpAndResetPassword = async (req, res) => {
             return res.status(400).json({ message: 'Invalid request' });
         }
 
-        // Check if OTP is expired (assuming valid for 30 seconds)
+        // Check if OTP is expired (assuming valid for 60 seconds)
         const otpSentTime = user.otpSentAt;
         const currentTime = Date.now();
-        if (currentTime - otpSentTime > 30 * 1000) {
+        if (currentTime - otpSentTime > 60 * 1000) {
             return res.status(400).json({ message: 'OTP has expired' });
         }
 
@@ -190,4 +214,8 @@ const customerVerifyOtpAndResetPassword = async (req, res) => {
     }
 };
 
-module.exports = { customerLogin, customerSignup, customerPasswordReset, customerVerifyOtpAndResetPassword };
+
+
+
+
+module.exports = { customerLogin, customerSignup, customerPasswordReset, customerVerifyOtpAndResetPassword,customerLogout };

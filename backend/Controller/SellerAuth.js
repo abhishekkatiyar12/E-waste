@@ -20,44 +20,71 @@ const hashPassword = async(x) => {
 
 
 
-const sellerLogin=async(req,res)=>{
-    try{
-        const {email,password}=req.body;
-        if(!email || !password){
-            return res.status(401).json({
-              status:'fail',
-              message:'please provide the valid email and password'
-            })
+const sellerLogin = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({
+                status: 'fail',
+                message: 'Please provide valid email and password.'
+            });
         }
 
-        const user=await sellerModel.findOne({email})
-        if(user){
-            const hashedPAssword=user.password;
-            const result=await bcrypt.compare(password,hashedPAssword);
-            if(result){
-                res.send(500).json({
-                    status:'success',
-                    data:{
-                        user:user,
-                        token:generateToken(user.id),
+        const user = await sellerModel.findOne({ email });
+        if (user) {
+            const hashedPassword = user.password;
+            const isMatch = await bcrypt.compare(password, hashedPassword);
+            if (isMatch) {
+                // Store user information in the session
+                req.session.userId = user.id; // Store user ID in the session
+                req.session.email = user.email; // Optional: store other user info if needed
+
+                return res.status(200).json({
+                    status: 'success',
+                    data: {
+                        user: {
+                            id: user.id,
+                            email: user.email,
+                            // Include other user fields as necessary
+                        },
                     }
                 });
-            }else{
-                res.status(500).json({
-                    status:'fail',
-                    message:'Email or Password is Incorrect',
-                })
+            } else {
+                return res.status(401).json({
+                    status: 'fail',
+                    message: 'Email or Password is Incorrect.',
+                });
             }
+        } else {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'User not found.',
+            });
         }
+    } catch (err) {
+        return res.status(500).json({
+            status: 'fail',
+            message: err?.message,
+        });
     }
+};
 
-    catch(err){
-        res.status(500).json({
-            status:'fail',
-            message:err?.message,
-         })
-    }
-}
+// Logout function
+const sellerLogout = (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({
+                status: 'fail',
+                message: 'Error logging out.',
+            });
+        }
+        res.clearCookie('connect.sid'); // Clear session cookie
+        return res.status(200).json({
+            status: 'success',
+            message: 'Successfully logged out.',
+        });
+    });
+};
 
 const sellerSignup= async (req,res)=>{
     try{
@@ -187,4 +214,4 @@ const sellerVerifyOtpAndResetPassword = async (req, res) => {
 
   
   
-  module.exports={sellerLogin,sellerSignup,sellerPasswordReset,sellerVerifyOtpAndResetPassword};
+  module.exports={sellerLogin,sellerSignup,sellerPasswordReset,sellerVerifyOtpAndResetPassword,sellerLogout};

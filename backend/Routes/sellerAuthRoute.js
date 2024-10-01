@@ -1,5 +1,5 @@
 const express=require("express");
-const{sellerLogin,sellerSignup,sellerPasswordReset,sellerVerifyOtpAndResetPassword}=require("../Controller/SellerAuth");
+const{sellerLogin,sellerSignup,sellerPasswordReset,sellerVerifyOtpAndResetPassword,sellerLogout}=require("../Controller/SellerAuth");
 
 
 const sellerRouter=express.Router();
@@ -10,6 +10,10 @@ sellerRouter.route('/signup')
 
 sellerRouter.route('/login')
 .post(sellerLogin);
+
+sellerRouter.route('logout')
+.post(sellerLogout);
+
 
 sellerRouter.route('/requestPasswordReset').post(sellerPasswordReset);
 
